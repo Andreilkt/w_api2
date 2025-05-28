@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Погода</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 10px;
+        }
+        .weather-block {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .flash {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Прогноз погоды</h1>
+    <form method="post">
+        <label for="city">Введите название города:</label><br />
+        <input type="text" id="city" name="city" value="{{ city }}" required />
+        <button type="submit">Показать прогноз</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flash">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% if weather %}
+    <div class="weather-block">
+        <h2>Погода в {{ weather.location.name }}, {{ weather.location.country }}</h2>
+
+        <p><strong>Температура:</strong> {{ weather.current.temp_c }}°C</p>
+        <p><strong>Состояние:</strong> {{ weather.current.condition.text }}</p>
+        <p><strong>Ощущается как:</strong> {{ weather.current.feelslike_c }}°C</p>
+        <p><strong>Влажность:</strong> {{ weather.current.humidity }}%</p>
+        <p><strong>Ветер:</strong> {{ weather.current.wind_kph }} км/ч, направление {{ weather.current.wind_dir }}</p>
+
+        <h3>Прогноз на ближайшие часы:</h3>
+        <ul>
+            {% for hour in weather.forecast.forecastday[0].hour[:3] %}
+            <li>
+                <strong>{{ hour.time.split(' ')[1] }}</strong> —
+                {{ hour.temp_c }}°C, {{ hour.condition.text }}, ветер {{ hour.wind_kph }} км/ч
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</body>
+</html>
